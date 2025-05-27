@@ -1,0 +1,24 @@
+Me: I'm creating a weather advising application and I have 3 routes I can take for implementing the weather data component. They're provided below: 
+
+1. Foundation Option: Use the provided fetch-my-weather package 
+
+A simplified interface to wttr.in weather services that handles API complexities
+Provides consistent data structures and error handling
+Allows you to focus on application logic and other components
+Perfect for getting started and meeting core requirements
+
+2. Standard Option: Use the wttr.in service API directly 
+
+Example: https://wttr.in/London?format=j1 returns JSON data
+Documentation: https://github.com/chubin/wttr.in
+Requires implementing your own request handling and data processing
+Demonstrates API interaction skills and offers more customisation
+
+3. Extension Option: Implement your own solution with OpenWeatherMap or similar 
+
+Requires obtaining and securely handling an API key
+Offers access to more detailed weather data
+Provides experience with commercial API integration
+Eligible for bonus points if well-implemented with proper error handling22
+
+I'm a complete novice with Python and programming in general, and struggle with easily understanding programming concepts, but I still want to be able to create a robust application. Can you help me compare these three options, and provide a starting off framework on what I should tackle for each option?
