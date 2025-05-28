@@ -1,16 +1,9 @@
-# ✍️ Project Reflection
+# ✍️ Project Reflection (414 words)
 
-## AI Tools Used
-What tools did you use (e.g., ChatGPT, Copilot)? How did they help?
+In the process of creating my weather app, I utilized ChatGPT, as I was most familiar with this AI tool. I had always viewed it as a tool that wasn’t meant to be used in university work, so I was surprised to learn about the intentional prompting techniques through the duration of this project. I attempted to try using other tools such as Copilot and DeepAI, thinking they’d be more helpful considering the programming-intense component of the project. However I found ChatGPT had the best all-rounder approach to providing understandable, well-rounded guidance when I was initially comparing answering styles. 
 
-## Prompting Techniques
-Which intentional prompting strategies did you apply?
+The techniques I used the most were progressive disclosure, reverse engineering and chain-of-thought programming. After using these three quite frequently, I most favoured the progressive disclosure technique; with this, I could prompt the AI for a basic function framework and to explain its functions and specific terms, while including progressive requirements that I wanted the AI to fulfil with each explanation that allowed me to add further iterations. I also integrated reverse engineering through this, as if errors were to occur with their suggested code, it made me have to back track and ask AI to help fortify the code or ask which sections of the function could be causing the error. It also meant I wasn’t just taking each provided function at face value, and used these techniques to ask about robustness and error handling. 
 
-## What Worked Well?
-Describe one thing you’re proud of.
-
-## What Would You Do Differently?
-Describe one thing you'd change if you had more time.
-
-## Final Thoughts
-Any parting comments on your learning experience?
+Something I’d want to change if I had more time is just giving more considerations into each module and major decision node. Given time constraints and other factors, I felt my work wasn’t as intentional and thought-through at certain parts as I could’ve made it, especially with how involved I thought this project was. 
+One thing I’m proud of is building my first application ever, in any programming language. 
+Even though I’m fully aware of how much more could go into developing a more intricate and better functioning weather application, I have always been daunted by programming in general, despite an interest. This caused me to have never touched it, which may have been the reason why I did end up struggling so much in this project. But enduring the process of deciding which options to implement and editing functions over and over again allowed me to have a newfound appreciation for the work behind building even the most basic interface. So I’m proud to even have a small accomplishment under my belt, no matter the mark it receives. 
