@@ -1,12 +1,7 @@
-ME: Before any functions, what is section for Natural Language Processing asking for and what are the main elements to parse weather content that I should consider?
+ME: Before any functions, what is the section for Natural Language Processing asking for and what are the main elements to parse weather content that I should consider?
 The preliminary comments provided are # Define parse_weather_question() and generate_weather_response() and # Define menu functions using pyinputplus or ipywidgets.
 
-AI: You're referring to this comment at the start of the Natural Language Processing section:
-    
-    # Define parse_weather_question() and generate_weather_response() here
-    
-    This is not executable code — it's a section header comment meant to tell you:
-    
+AI: 
     ✅ What this section is for:
     It's where you're expected to implement two core functions related to Natural Language Processing (NLP) in your weather application:
     
@@ -16,11 +11,6 @@ AI: You're referring to this comment at the start of the Natural Language Proces
     
     🧠 What should parse_weather_question() be doing?
     This function is responsible for understanding a user's natural language question about the weather — something like:
-    
-    “Will it rain in Sydney tomorrow?”
-    “What's the temperature in Perth over the next 2 days?”
-    “Do I need a jacket today in Melbourne?”
-    
     To support these, the function needs to extract key elements from the sentence.
     
     🔍 Key elements to parse:
@@ -33,23 +23,576 @@ AI: You're referring to this comment at the start of the Natural Language Proces
     
     🛠️ What does generate_weather_response() do?
     Once the question is parsed into structured data (like {'city': 'Adelaide', 'days': 2, 'attribute': 'rain'}), this function:
-    
     Uses that info to look up weather data
-    
     Generates a natural-language response like:
-    
     “Here’s the rain forecast for Adelaide: Tomorrow you can expect scattered showers 🌧️.”
     
-    Summary
-    So before you even start writing the actual functions, you're being asked to:
     
-    Think about what types of things users might ask (rain, temp, time, place)
-    
-    Design your code to recognize those elements in a flexible and readable way
-    
-    Convert user input → structured info → readable response
     
 
 
 ME: Can you give me an example of parsing logic you recommend and what are the key components that make up its function?
 AI: 
+Let's walk through an example parsing function and then break down the key components that make it effective.
+
+✅ Example: parse_weather_question(question)
+import re
+
+def parse_weather_question(question):
+    """
+    Parse a natural language weather question.
+
+    Args:
+        question (str): User's weather-related question
+
+    Returns:
+        dict: Extracted info: city, days, attribute
+    """
+    question = question.lower()
+
+    # Extract city using a basic list or fallback
+    cities = ["perth", "sydney", "melbourne", "adelaide", "brisbane"]
+    city = next((c.title() for c in cities if c in question), "Perth")
+
+    # Extract forecast days
+    if "tomorrow" in question:
+        days = 2
+    elif "today" in question or "now" in question:
+        days = 1
+    else:
+        match = re.search(r"next (\d+) days?", question)
+        days = int(match.group(1)) if match else 3
+
+    # Identify weather attribute
+    if "rain" in question or "umbrella" in question or "precipitation" in question:
+        attribute = "precipitation"
+    elif "temperature" in question or "hot" in question or "cold" in question:
+        attribute = "temperature"
+    elif "weather" in question or "forecast" in question:
+        attribute = "general"
+    else:
+        attribute = "general"
+
+    return {
+        "city": city,
+        "days": days,
+        "attribute": attribute
+    }
+🔍 What makes this parsing logic effective?
+Component	Purpose
+question.lower()	Normalizes the input to lowercase for easier matching
+City Matching	Uses a list of known cities and in to detect which one is mentioned
+Time Parsing	Handles keywords like "today", "tomorrow", or "next X days" with regex
+Attribute Detection	Matches user intent with weather types: temperature, rain, general, etc.
+Fallback Defaults	Provides a default city ("Perth") and days (3) if not specified
+Modular Output	Returns a dictionary so other functions can use the result easily
+
+
+Once you have this parsing logic:
+You can call your get_weather_data(city, days) function using the output.
+Then generate a response using generate_weather_response(parsed_question, weather_data).Let's walk through an example parsing function and then break down the key components that make it effective.
+
+
+
+
+[CONVERSATION OMITTED - Asking to further explain parsing logic and terms, and clarifying that ipywidgets is the used extension]
+
+
+
+ME: My function is coming up with a weird error. even though my previous function that defines parse_weather_question() ran correctly supposedly (showed the green check). 
+What is this saying?
+❌ Network or request error: 404 Client Error: Not Found for url: https://wttr.in/In%20Brisbane%20Tomorrow?format=j1
+⚠️ Sorry, I couldn't retrieve valid weather data.
+
+AI: 
+        Great catch — the issue is caused by how the city is parsed in the question:
+        "Will it rain in Brisbane tomorrow?"
+        Your function currently uses a basic pattern that matches everything after "in " — so it's grabbing "Brisbane tomorrow" as the city.
+        
+        🔍 The Problem
+        The regex in this line:
+        match = re.search(r"in ([a-zA-Z\s]+)", question)
+        ...matches "in Brisbane tomorrow", causing city = "Brisbane Tomorrow" → which turns into a bad URL like:
+        https://wttr.in/Brisbane%20Tomorrow?format=j1
+        Hence the 404 error (invalid city).
+        
+        ✅ The Solution
+        We need to strip out any time-related words like "today" or "tomorrow" from the captured city. Here's a fixed version:
+
+
+
+ME: It's running correctly now, but can you explain each line and what its outputting?
+AI:Absolutely — let's work on generate_weather_response() together. This function’s job is to take:
+        
+        The parsed user question (e.g., city, days, weather attribute)
+        The weather data fetched from wttr.in
+        And return a friendly, natural-language answer like:
+        "Yes, it looks like it will rain in Brisbane tomorrow. Don’t forget your umbrella!"
+        
+        ✅ Here's the function:
+        def generate_weather_response(parsed_question, weather_data):
+            """
+            Generate a natural language response to a weather question.
+            Args:
+                parsed_question (dict): Parsed question data with city, days, and attribute
+                weather_data (dict): Weather data returned from get_weather_data()
+            Returns:
+                str: Natural language response
+            """
+            if not weather_data or "forecast" not in weather_data or not weather_data["forecast"]:
+                return "⚠️ Sorry, I couldn't retrieve valid weather data."
+            city = parsed_question.get("city", "your location")
+            days = parsed_question.get("days", 1)
+            attribute = parsed_question.get("attribute", "general")
+            forecast = weather_data["forecast"][:days]
+            if attribute == "rain":
+                mentions_rain = any(
+                    any(word in day["condition"].lower() for word in ["rain", "shower", "thunderstorm", "drizzle"])
+                    for day in forecast
+                )
+                if mentions_rain:
+                    return f"☔ Yes, it looks like there will be rain in {city} over the next {days} day(s). Don’t forget your umbrella!"
+                else:
+                    return f"🌤️ No rain is expected in {city} during the next {days} day(s). Looks like dry weather ahead!"
+            elif attribute == "temperature":
+                temps = [(day["min_temp_C"], day["max_temp_C"]) for day in forecast]
+                response = f"🌡️ Here's the temperature forecast for {city}:\n"
+                for i, day in enumerate(forecast):
+                    response += f"• {day['date']}: {day['min_temp_C']}°C – {day['max_temp_C']}°C, {day['condition']}\n"
+                return response.strip()        
+            elif attribute == "wind":
+                # Wind is part of current_condition; not supported in forecast by wttr.in JSON
+                current = weather_data.get("current", {})
+                wind_kmph = current.get("windspeedKmph", "N/A")
+                return f"🌬️ Current wind speed in {city} is {wind_kmph} km/h."        
+            else:
+                # General overview
+                response = f"📍 Weather overview for {city}:\n"
+                for day in forecast:
+                    response += f"• {day['date']}: {day['condition']}, {day['min_temp_C']}°C – {day['max_temp_C']}°C\n"
+                return response.strip()
+
+
+        🧠 Let’s break it down:
+        🧩 Step 1: Check for missing data
+        if not weather_data or "forecast" not in weather_data or not weather_data["forecast"]:
+        This makes sure the API didn't fail. If so, return a friendly fallback message.
+        
+        🧩 Step 2: Unpack parsed data        
+        city = parsed_question.get("city", "your location")
+        days = parsed_question.get("days", 1)
+        attribute = parsed_question.get("attribute", "general")
+        This extracts info from the user’s question: which city?, for how long?, what weather type?
+        
+        🧩 Step 3: Process forecast data        
+        forecast = weather_data["forecast"][:days]
+        We slice the forecast for the number of days the user asked about.
+        
+
+
+
+
+ME: How can I improve this code, as changing the day description, for e.g. Will it rain in Perth this week' vs. 'Will it rain in Perth tomorrow' brings up different answers. 
+    How can I fortify this function?
+AI:
+        Great observation — your parse_weather_question() function needs stronger parsing logic to accurately extract meaning from variations like:        
+        "tomorrow"
+        "this week"
+        "today"
+        "in 3 days"
+        "next weekend"
+        
+        To fortify it and make it more robust, we’ll:
+        ✅ 1. Add Synonym and Phrase Detection
+        Use more intelligent pattern matching to convert natural phrases into numbers, e.g.:
+        
+        Phrase	Days
+        today	1
+        tomorrow	2
+        this week	5–7
+        next week	7–14
+        in 3 days	4
+        weekend (Sat/Sun)	5–7
+        
+        ✅ 2. Update parse_weather_question() Logic
+        Here’s an improved version:
+        
+        import re
+        
+        def parse_weather_question(question):
+            """
+            Parse a natural language weather question.
+        
+            Args:
+                question (str): User's weather-related question
+        
+            Returns:
+                dict: Extracted information including city, days (forecast range), and weather attribute
+            """
+            question = question.lower().strip()
+        
+            # Default values
+            city = "your city"
+            days = 1
+            attribute = "general"
+        
+            # Weather attributes
+            if "rain" in question:
+                attribute = "rain"
+            elif "temperature" in question or "hot" in question or "cold" in question:
+                attribute = "temperature"
+            elif "wind" in question:
+                attribute = "wind"
+        
+            # Time phrases mapped to forecast days
+            if "today" in question:
+                days = 1
+            elif "tomorrow" in question:
+                days = 2
+            elif "this week" in question or "over the week" in question:
+                days = 5
+            elif "weekend" in question:
+                days = 6  # Assuming weekend is within the 6–7 day range
+            elif match := re.search(r"in (\d+) days", question):
+                days = int(match.group(1)) + 1
+            elif "next week" in question:
+                days = 7  # Could be extended to 7–14 with more data
+        
+            # Try to extract city after prepositions like "in" or "for"
+            match = re.search(r"(?:in|for)\s+([a-zA-Z\s]+)", question)
+            if match:
+                city = match.group(1).strip().title()
+        
+            return {
+                "city": city,
+                "days": days,
+                "attribute": attribute
+            }
+        ✅ Key Improvements:
+        Improvement	How it Helps
+        Synonym detection	Recognizes "hot", "cold", etc. as temperature queries
+        Flexible time parsing	Maps "this week", "in 3 days", "weekend" correctly
+        Regex fallback for city names	Grabs names after “in” or “for” regardless of position
+        .title() on city	Fixes lowercase names like “brisbane” → “Brisbane”
+        
+    
+
+
+ME: How would I make adjustments if I also want to add parse logic for weekday/weekend names e.g. "Is it going to rain this Wednesday'' and subsequent error handling if the requested day extends past the 3-day forecast limit of wttr.in?
+AI: 🔧 Step 1: Recognize Weekday Names
+        We'll map weekdays to their day-offset relative to today (e.g. if today is Monday and the user asks about Wednesday, it's 3 days ahead).
+        
+        We’ll use Python’s datetime to help.
+        
+        ✅ Updated parse_weather_question() with Weekday Support
+        
+        import re
+        from datetime import datetime, timedelta
+        
+        def parse_weather_question(question):
+            """
+            Parse a natural language weather question and extract city, forecast days, and attribute.
+        
+            Args:
+                question (str): User's weather-related question
+        
+            Returns:
+                dict: Parsed data including city, days (forecast range), and weather attribute
+            """
+            question = question.lower().strip()
+        
+            # Default values
+            city = "your city"
+            days = 1
+            attribute = "general"
+        
+            # Detect weather attribute
+            if "rain" in question:
+                attribute = "rain"
+            elif "temperature" in question or "hot" in question or "cold" in question:
+                attribute = "temperature"
+            elif "wind" in question:
+                attribute = "wind"
+        
+            # Handle basic time phrases
+            if "today" in question:
+                days = 1
+            elif "tomorrow" in question:
+                days = 2
+            elif "this week" in question:
+                days = 3  # max wttr.in range
+            elif match := re.search(r"in (\d+) days", question):
+                requested = int(match.group(1)) + 1
+                days = min(requested, 3)
+        
+            # Handle weekday names
+            weekday_map = {
+                "monday": 0, "tuesday": 1, "wednesday": 2, "thursday": 3,
+                "friday": 4, "saturday": 5, "sunday": 6
+            }
+            today_idx = datetime.today().weekday()
+        
+            for weekday, target_idx in weekday_map.items():
+                if weekday in question:
+                    delta = (target_idx - today_idx) % 7
+                    if delta == 0:
+                        days = 1  # Today
+                    else:
+                        days = delta + 1  # wttr.in uses 1-based indexing
+                    break
+        
+            # Enforce 3-day forecast limit
+            if days > 3:
+                raise ValueError("⚠️ The forecast only supports up to 3 days ahead (including today).")
+        
+            # Extract city name
+            match = re.search(r"(?:in|for)\s+([a-zA-Z\s]+)", question)
+            if match:
+                city = match.group(1).strip().title()
+        
+            return {
+                "city": city,
+                "days": days,
+                "attribute": attribute
+            }
+        📌 How This Works
+        Logic Added	Purpose
+        weekday_map	Converts weekday names to index (0 = Monday)
+        datetime.today().weekday()	Gets today’s index to calculate offset
+        delta = (target_idx - today_idx) % 7	Ensures day wrap-around (e.g. Sun → Mon)
+        raise ValueError(...)	Prevents user from querying past the available 3-day limit
+        
+        ✅ Examples
+        # Example 1 – Wednesday and today is Monday
+        parse_weather_question("Will it rain in Brisbane this Wednesday?")
+        # → {'city': 'Brisbane', 'days': 3, 'attribute': 'rain'}
+        
+        # Example 2 – Asking for Sunday on a Friday
+        parse_weather_question("Is it going to be cold in Perth on Sunday?")
+        # → {'city': 'Perth', 'days': 3, 'attribute': 'temperature'}
+        
+        # Example 3 – Asking for next Thursday on a Sunday (out of range)
+        parse_weather_question("Will it be windy in Melbourne next Thursday?")
+        # → Raises ValueError: ⚠️ The forecast only supports up to 3 days ahead
+        🛠️ What Happens if the Question Exceeds the Forecast Range?
+        Right now it will raise a ValueError. You can catch that when calling the function, like this:
+        
+        try:
+            parsed = parse_weather_question("Will it rain in Perth next Friday?")
+            weather_data = get_weather_data(parsed["city"], parsed["days"])
+            print(generate_weather_response(parsed, weather_data))
+        except ValueError as ve:
+            print(ve)
+        Would you like me to:
+        
+        ✅ Add better feedback instead of a raw error? (e.g. “Please rephrase your question for a date within 3 days.”)
+        
+        ✅ Integrate this into your UI section when we get there?
+        
+        Let me know and I can build it with you!
+
+
+
+
+ME: Yes, should I just change the value error statement inside the function to have a better feedback?
+AI: Yes, exactly! You can replace the raise ValueError(...) line inside your parse_weather_question() function with a custom message return or a graceful error strategy, depending on how you want your program to behave.
+
+        ✅ Option 1: Return an error message instead of raising an exception
+        Replace:
+        raise ValueError("⚠️ The forecast only supports up to 3 days ahead (including today).")
+        With:
+        return {
+            "error": "⚠️ Sorry, the forecast only supports up to 3 days ahead (including today). Please rephrase your question."
+        }
+        Then, when calling the function, check for the "error" key:       
+        parsed = parse_weather_question("Will it rain in Perth next Friday?")        
+        if "error" in parsed:
+            print(parsed["error"])
+        else:
+            weather_data = get_weather_data(parsed["city"], parsed["days"])
+            print(generate_weather_response(parsed, weather_data))
+       
+        ✅ Option 2: Keep raise ValueError(...), but catch it later
+        You might keep your original exception-based version but wrap the caller in a try/except block for user feedback:       
+        try:
+            parsed = parse_weather_question("Will it rain in Perth next Friday?")
+            weather_data = get_weather_data(parsed["city"], parsed["days"])
+            print(generate_weather_response(parsed, weather_data))
+        except ValueError as ve:
+            print(str(ve))  # Or use a custom message
+        This is cleaner if your UI will guide the user with error messages and you want parsing logic to stay strict.
+        
+
+
+[CONVERSATION OMITTED - choose 2, then changed decision and chose option 1. Reworked some edits into the function with chat correcting it]
+
+
+
+
+ME: My function is now resulting with this error:     
+        UnboundLocalError                         Traceback (most recent call last)
+        <ipython-input-47-a726beab7bc5> in <cell line: 0>()
+              2 user_question = "Will it rain in Perth this Wednesday?"
+              3 
+        ----> 4 parsed = parse_weather_question(user_question)
+              5 
+              6 if parsed.get("status") == "error":
+        
+        <ipython-input-45-2b94a75fe93d> in parse_weather_question(question)
+             44 
+             45         city_match = re.search(r"in ([a-zA-Z\s]+)", question)
+        ---> 46     if city_match:
+             47         city = city_match.group(1).strip()
+             48         # Remove trailing keywords that aren't part of the city name
+        
+        UnboundLocalError: cannot access local variable 'city_match' where it is not associated with a value
+
+AI:Thanks for catching that — you're seeing an UnboundLocalError because the line:
+
+        if city_match:
+        is being reached even when city_match wasn't assigned at all (i.e., if the re.search(...) line wasn't run due to earlier logic).
+        
+        Let’s walk through and fix this correctly.
+        
+        ✅ The Corrected Version of parse_weather_question()
+        Here is the safe and improved full version of the function that:
+        
+        Handles the city name cleaning properly.
+        
+        Avoids undefined variable errors.
+        
+        Includes robust fallback and user feedback.
+       
+        import re
+        from datetime import datetime
+        
+        def parse_weather_question(question):
+            """
+            Parse a user's natural language weather question into structured components.
+        
+            Args:
+                question (str): The user's weather question.
+        
+            Returns:
+                dict: Parsed components including city, days, attribute, or an error message.
+            """
+            question = question.lower()
+        
+            # Step 1: Detect attribute
+            attributes = ["rain", "snow", "cloud", "sun", "clear", "temperature", "hot", "cold"]
+            found_attr = next((attr for attr in attributes if attr in question), "general")
+        
+            # Step 2: Determine number of forecast days
+            days = 1  # default
+            weekdays = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+        
+            if "today" in question:
+                days = 1
+            elif "tomorrow" in question:
+                days = 2
+            elif "week" in question:
+                days = 3
+            else:
+                for i, day in enumerate(weekdays):
+                    if day in question:
+                        today_idx = datetime.today().weekday()
+                        target_idx = i
+                        delta_days = (target_idx - today_idx) % 7
+                        days = delta_days + 1
+                        break
+        
+            # Step 3: Check forecast range limit
+            if days > 3:
+                return {
+                    "status": "error",
+                    "error": "❌ Sorry, only 3-day forecasts are available. Please choose today, tomorrow, or this week."
+                }
+        
+            # Step 4: Extract city name
+            city_match = re.search(r"in ([a-zA-Z\s]+)", question)
+            if city_match:
+                city = city_match.group(1).strip()
+                # Clean up trailing words like 'this Wednesday'
+                city = re.sub(r"\b(today|tomorrow|this week|this|" + "|".join(weekdays) + r")\b", "", city).strip()
+            else:
+                return {
+                    "status": "error",
+                    "error": "⚠️ Please include a location in your weather question (e.g. 'in Brisbane')."
+                }
+        
+            # Return structured data
+            return {
+                "status": "ok",
+                "city": city.title(),
+                "attribute": found_attr,
+                "days": days
+            }
+        ✅ Now when you run:
+        
+        user_question = "Will it rain in Perth this Wednesday?"
+        
+        parsed = parse_weather_question(user_question)
+        
+        if parsed.get("status") == "error":
+            print(parsed["error"])
+        else:
+            weather_data = get_weather_data(parsed["city"], parsed["days"])
+            print(generate_weather_response(parsed, weather_data))
+        …it will properly extract:
+        
+        "Perth" as the city
+        
+        days = 3
+        
+        attribute = "rain"
+        
+        And it will avoid errors from bad city parsing or undefined variables.
+        
+        Would you like me to also double-check that generate_weather_response() is working as expected for these inputs next?
+                
+                
+                
+
+
+ME: It works now, which means the parsing logic is correct! Although this is correct and the outcome I wanted, can you help where the two temperature forecasts are returning from (as in which part of the function?). As for the current temperature and unknown condition, is it required to be in the function if this will be the only answers generated as wttr.in doesn't have numerical temp figures. 
+Just overall wondering how I can further improve both the parse_weather_question() and Generate_weather_response() please!
+                
+AI:        
+        How to check: Look inside your generate_weather_response() function and make sure: 
+        You’re returning the final response as a return statement.
+        You’re not also calling print() inside that function unless it’s for debugging.        
+        
+        wttr.in sometimes omits or simplifies the JSON response if data isn’t available or if it’s misinterpreting the location (e.g., “In Perth” instead of just “Perth”).
+        You can improve resilience by:
+        Adding fallback values.
+        Ensuring the city name is cleaned before being passed to get_weather_data() (you’re already mostly doing this with .title()).
+        Optionally skipping the current temperature section if it's N/A or empty.
+
+        ✅ Improvements for parse_weather_question()
+        Additions:
+        Support abbreviations or shorthand:
+        Improve city extraction:
+        Strip out words like “this”, “next”, or day names from the city name if captured by regex:
+        Log or print what was parsed (for debugging):
+        
+        ✅ Improvements for generate_weather_response()
+        Suggested improvements:
+        Check if current data is missing and show a message like:
+        
+
+        if not current_temp or current_temp == "N/A":
+            response += "🌡️ Current temperature data not available.\n"
+        Use attribute (rain, snow, etc.) to customize response:
+        If the parsed attribute is "rain", tailor forecast response to only mention rain conditions.
+        Avoid repetition if no new forecast data is found:
+        Track and avoid printing duplicate days.
+
+
+
+
+ME: Even though it runs technically, the resulting output says "⚠️ Please include a location in your weather question (e.g. 'in Brisbane')." even though Perth is already in the user prompt. How do I fix this bug?
+AI: 🚨 The Bug
+The for loop that removes trailing keywords from the city is not indented properly, so it’s running even when city_match fails, and then the else statement right after it is incorrectly attached to the for loop, not the if city_match.
+This causes the parser to think no city was matched — even though "Perth" clearly was.
+
+✅ Make sure the for loop is inside the if block, and the else is attached to the if city_match, not the for loop.
