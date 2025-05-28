@@ -380,84 +380,82 @@ AI:
 
 
 
-
-
 ME:
     Is this piece of code appropriate/clear for the requirements or should I use the above 'fetch-weather' code instead?
 
 
 AI:
-Here’s a breakdown to help you decide:
-
-🔍 Your Current Function:
-python
-Copy code
-from fetch_my_weather import get_weather
-
-def get_weather_data(city="Perth", forecast_days=3):
-    try:
-        weather_data = get_weather(city, forecast_days)
-        return weather_data
-    except Exception as e:
-        return {"error": str(e)}
-✅ Strengths:
-Clean and readable ✅
-
-Includes error handling ✅
-
-Uses default arguments (good for flexibility) ✅
-
-Follows best practices for small functions ✅
-
-🟡 Minor Improvements to Consider:
-You're returning all the raw data, which might be overwhelming or unclear to users/markers.
-
-For assignment readability, it's usually better to format or simplify the output a little.
-
-✅ Recommended Polished Version for Your Assignment:
-This version adds light processing and is ideal for a beginner-level assignment.
-
-python
-Copy code
-from fetch_my_weather import get_weather
-
-def get_weather_data(city="Perth", forecast_days=3):
-    """
-    Fetches weather data for a given city and formats key information.
-
-    Args:
-        city (str): Name of the city
-        forecast_days (int): Number of forecast days (1-5)
-
-    Returns:
-        dict: Dictionary with current temperature and condition, or error message
-    """
-    try:
-        data = get_weather(city, forecast_days)
-        current = data["current_condition"]
-
-        return {
-            "city": city,
-            "temperature_C": current["temp_C"],
-            "condition": current["weatherDesc"][0]["value"]
-        }
-
-    except Exception as e:
-        return {"error": str(e)}
-🧪 Example test:
-python
-Copy code
-result = get_weather_data("Sydney", 5)
-print(result)
-Output:
-
-python
-Copy code
-{'city': 'Sydney', 'temperature_C': '20', 'condition': 'Partly cloudy'}
-✍️ Summary: Use This Improved Version
-Yes — your original version is a solid foundation and already "appropriate" in terms of correctness. But for a polished, assignment-ready, beginner-friendly submission, I recommend using the improved version above.
-
-
+    Here’s a breakdown to help you decide:
+    
+    🔍 Your Current Function:
+    python
+    Copy code
+    from fetch_my_weather import get_weather
+    
+    def get_weather_data(city="Perth", forecast_days=3):
+        try:
+            weather_data = get_weather(city, forecast_days)
+            return weather_data
+        except Exception as e:
+            return {"error": str(e)}
+    ✅ Strengths:
+    Clean and readable ✅
+    
+    Includes error handling ✅
+    
+    Uses default arguments (good for flexibility) ✅
+    
+    Follows best practices for small functions ✅
+    
+    🟡 Minor Improvements to Consider:
+    You're returning all the raw data, which might be overwhelming or unclear to users/markers.
+    
+    For assignment readability, it's usually better to format or simplify the output a little.
+    
+    ✅ Recommended Polished Version for Your Assignment:
+    This version adds light processing and is ideal for a beginner-level assignment.
+    
+    python
+    Copy code
+    from fetch_my_weather import get_weather
+    
+    def get_weather_data(city="Perth", forecast_days=3):
+        """
+        Fetches weather data for a given city and formats key information.
+    
+        Args:
+            city (str): Name of the city
+            forecast_days (int): Number of forecast days (1-5)
+    
+        Returns:
+            dict: Dictionary with current temperature and condition, or error message
+        """
+        try:
+            data = get_weather(city, forecast_days)
+            current = data["current_condition"]
+    
+            return {
+                "city": city,
+                "temperature_C": current["temp_C"],
+                "condition": current["weatherDesc"][0]["value"]
+            }
+    
+        except Exception as e:
+            return {"error": str(e)}
+    🧪 Example test:
+    python
+    Copy code
+    result = get_weather_data("Sydney", 5)
+    print(result)
+    Output:
+    
+    python
+    Copy code
+    {'city': 'Sydney', 'temperature_C': '20', 'condition': 'Partly cloudy'}
+    ✍️ Summary: Use This Improved Version
+    Yes — your original version is a solid foundation and already "appropriate" in terms of correctness. But for a polished, assignment-ready, beginner-friendly submission, I recommend using the improved version above.
+    
+    
 
 ME:
     But should I be using the code you gave in option 1, or this reworked code that I provided? Which appears clearer and cleaner for me to work off?
@@ -537,7 +535,8 @@ AI:
 
 
 ME:
-    I don't understanding the different between your weather.py and the main.py and CLI. My basic assignment layout provided just has a sections to be laid out in:
+    I don't understanding the different between your weather.py and the main.py and CLI. 
+    My base layout provided is as follows:
     1) Set up & imports
     2) Setup and configuration
     3) Weather Data functions
@@ -650,9 +649,144 @@ AI:
     print("\n=== Example: Sydney 3-day Forecast ===")
     example = get_weather_data("Sydney", 3)
     display_weather_info(example)
-    ✅ Summary
 
 
 
 
-ME: 
+ME:     
+    Please recommend a structure best suited for option 1, that would be clear for me to understand but also meet the project requirements.
+
+
+AI:
+    ✅ Recommended Format: A Single Python Script with Clearly Labeled Sections
+One .py file (e.g., weather_app.py)
+
+Use code comments as section headers to follow the assignment structure
+
+This keeps it clean, readable, and easy for you and your marker
+
+🏗️ Final Suggested Structure (for Option 1 – fetch-my-weather)
+python
+Copy code
+# =============================================================================
+# 1. SETUP & IMPORTS
+# =============================================================================
+from fetch_my_weather import get_weather
+import pyinputplus as pyip  # or comment out if you're using input()
+# import ipywidgets if using Jupyter instead
+
+# =============================================================================
+# 2. SETUP AND CONFIGURATION
+# =============================================================================
+DEFAULT_CITY = "Perth"
+DEFAULT_FORECAST_DAYS = 3
+
+# =============================================================================
+# 3. WEATHER DATA FUNCTIONS
+# =============================================================================
+def get_weather_data(city=DEFAULT_CITY, forecast_days=DEFAULT_FORECAST_DAYS):
+    """
+    Fetches weather data for a given city and returns a simple summary.
+    """
+    try:
+        data = get_weather(city, forecast_days)
+        current = data["current_condition"]
+        return {
+            "city": city,
+            "temperature_C": current["temp_C"],
+            "condition": current["weatherDesc"][0]["value"]
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+# =============================================================================
+# 4. VISUALIZATION FUNCTIONS
+# =============================================================================
+def display_weather_info(weather_dict):
+    if "error" in weather_dict:
+        print("⚠️ Error:", weather_dict["error"])
+    else:
+        print(f"\n📍 Weather in {weather_dict['city']}:")
+        print(f"🌡️ Temperature: {weather_dict['temperature_C']}°C")
+        print(f"⛅ Condition: {weather_dict['condition']}")
+
+# =============================================================================
+# 5. NATURAL LANGUAGE PROCESSING
+# =============================================================================
+# (Optional: Leave empty or add a function to extract city names from sentences)
+# Example placeholder:
+# def extract_city_from_text(text): ...
+
+# =============================================================================
+# 6. USER INTERFACE
+# =============================================================================
+def weather_menu():
+    print("\n=== Weather Forecast Menu ===")
+    city = pyip.inputStr(prompt="Enter a city name: ")
+    days = pyip.inputInt(prompt="How many days to forecast? (1–5): ", min=1, max=5)
+    return city, days
+
+# =============================================================================
+# 7. MAIN APPLICATION LOGIC
+# =============================================================================
+def run_weather_app():
+    print("Welcome to the Weather Forecast Application!")
+    city, days = weather_menu()
+    weather = get_weather_data(city, days)
+    display_weather_info(weather)
+
+# =============================================================================
+# 8. TESTING AND EXAMPLES
+# =============================================================================
+if __name__ == "__main__":
+    # Run the app
+    run_weather_app()
+
+    # Example test:
+    print("\n--- Testing Example (Sydney, 3 days) ---")
+    example = get_weather_data("Sydney", 3)
+    display_weather_info(example)
+💡 Why This Works Well
+✅ All in one file — beginner friendly, easy to test
+
+✅ Sectioned like your brief, so it’s easy to read and assess
+
+✅ Meets Option 1 requirements (uses fetch-my-weather)
+
+✅ Expandable — you can add visual graphs or NLP later
+
+📝 What to Submit on GitHub
+Save the file as weather_app.py
+
+Include a simple README.md with instructions:
+
+markdown
+Copy code
+# Weather Forecast Application
+
+A simple Python app using the `fetch-my-weather` package to show weather forecasts.
+
+## How to Run
+
+1. Install requirements:
+pip install fetch-my-weather pyinputplus
+
+markdown
+Copy code
+
+2. Run the app:
+python weather_app.py
+
+pgsql
+Copy code
+
+## Features
+
+- Current weather data
+- Text menu for user input
+- Sample test case (Sydney, 3 days)
+
+## Future Improvements
+
+- Add weather graph visualizations
+- Support natural language input
