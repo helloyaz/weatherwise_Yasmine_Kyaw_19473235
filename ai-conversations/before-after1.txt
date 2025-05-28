@@ -1,3 +1,6 @@
+BAEFORE AND AFTER PROMPTING COMPARISON [27/05]
+
+
 MY INITIAL PROMPT
     Can you please suggest a function for parsing logic using parse_weather_question(user_question) as a base point.
 
