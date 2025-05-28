@@ -1,0 +1,143 @@
+MY INITIAL PROMPT
+    Can you please suggest a function for parsing logic using parse_weather_question(user_question) as a base point.
+
+
+
+EARLY AI-SUGGESTED FUNCTION
+    def parse_weather_question(user_question):
+        user_question = user_question.strip().lower()
+        if not user_question:
+            return {"status": "error", "error": "Question is empty."}
+    
+        import re
+        city_match = re.search(
+            r'in ([a-zA-Z\s]+?)(?:\s(?:on|this|next|today|tomorrow|monday|tuesday|wednesday|thursday|friday|saturday|sunday))?\??$',
+            user_question
+        )
+        city = city_match.group(1).strip() if city_match else ""
+    
+        days = 2
+        if "today" in user_question:
+            days = 1
+    
+        attribute = None
+        for keyword in ["rain", "snow", "sun", "clear", "cloud"]:
+            if keyword in user_question:
+                attribute = keyword
+                break
+    
+        if not city:
+            return {"status": "error", "error": "Could not determine the city."}
+    
+        return {
+            "status": "ok",
+            "city": city,
+            "days": days,
+            "attribute": attribute
+        }
+
+
+
+INITIAL CODE LIMITATIONS:
+    - I didn't prompt for error handling initially, so there it lacked functionality for edges cases
+    - Lots of issues with certain phrase handling 
+    - Lacked any docstrings, hard to follow along
+    - Didn't contain any output statements for incorrect question input
+    - Initial code has no validation for city indication or time indication
+    
+    
+
+
+MY FOLLOW-UP PROMPT
+    - To include error handling
+    - Asks where the 404 error caused by base function is stemming from - identified issue with regex logic.
+    - Prompted for stronger parsing logic for logical interpretation of text variations i.e.
+        "this week"
+        "today"
+        "in 3 days"
+    - Identify locations that don't exist after it suggested a function that didn't recognise 'Atlantis' as non-existing location.
+    - Include appropriate docstrings for commenting
+    
+
+
+
+IMPROVED AI-SUGGESTED FUNCTION CODE
+    # Define parse_weather_question()
+    import re
+    from datetime import datetime
+    
+    def parse_weather_question(question):
+        """
+        Parse a user's natural language weather question into structured components.
+    
+        Args:
+            question (str): The user's weather question.
+    
+        Returns:
+            dict: Parsed components including city, days, attribute, or an error message.
+        """
+        question = question.lower()
+    
+        # Step 1: Detect attribute
+        attributes = ["rain", "snow", "cloud", "sun", "clear", "temperature", "hot", "cold"]
+        found_attr = next((attr for attr in attributes if attr in question), "general")
+    
+        # Step 2: Determine number of forecast days
+        days = 1  # default
+        weekdays = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+    
+        if "today" in question:
+            days = 1
+        elif "tomorrow" in question:
+            days = 2
+        elif "week" in question:
+            days = 3
+        else:
+            for i, day in enumerate(weekdays):
+                if day in question:
+                    today_idx = datetime.today().weekday()
+                    target_idx = i
+                    delta_days = (target_idx - today_idx) % 7
+                    days = delta_days + 1
+                    break
+    
+        # Step 3: Check forecast range limit
+        if days > 3:
+            return {
+                "status": "error",
+                "error": "❌ Sorry, only 3-day forecasts are available. Please choose today, tomorrow, or this week."
+            }
+    
+        # Step 4: Extract city name
+        city_match = re.search(r"in ([a-zA-Z\s]+)", question)
+        if city_match:
+            city = city_match.group(1).strip()
+            # Remove weekday or time keywords from city string
+            for keyword in ["today", "tomorrow", "this week", "this weekend"] + weekdays:
+                city = city.replace(keyword, "").strip()
+            city = re.sub(r"\s+", " ", city).strip()  # Normalize spaces
+        else:
+            return {
+                "status": "error",
+                "error": "⚠️ Please include a location in your weather question (e.g. 'in Brisbane')."
+            }
+    
+        # Return structured data
+        return {
+            "status": "ok",
+            "city": city.title(),
+            "attribute": found_attr,
+            "days": days
+        }
+
+
+
+
+PROMPTING EFFECTIVENESS 
+    In the final function, the validation logic didn't only check for an empty string/question 
+    but also included if city or a time indication e.g.today = 1 day was missing in the user input.
+    The final version also allowed for more natural language input to be considered i.e. ''this weekend'',
+    and includes error handling. My prompting also allowed for an issue with a regex logic component
+    misunderstanding certain city + time prompts to be identified; this cleared up the function, allowed the correct
+    API call. Finally, inclusion of docstrings after prompting ensured for clearer documentation.
+
