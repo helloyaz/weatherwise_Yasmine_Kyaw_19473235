@@ -1,3 +1,8 @@
+Conversation about further working on my visualization aspect.
+
+
+
+
 ME: How could I further improve this code so make it more robust and interesting? 
 AI:
     ✅ 1. Robustness (Handle edge cases and unknowns)
