@@ -1,0 +1,55 @@
+ME: Before any functions, what is section for Natural Language Processing asking for and what are the main elements to parse weather content that I should consider?
+The preliminary comments provided are # Define parse_weather_question() and generate_weather_response() and # Define menu functions using pyinputplus or ipywidgets.
+
+AI: You're referring to this comment at the start of the Natural Language Processing section:
+    
+    # Define parse_weather_question() and generate_weather_response() here
+    
+    This is not executable code — it's a section header comment meant to tell you:
+    
+    ✅ What this section is for:
+    It's where you're expected to implement two core functions related to Natural Language Processing (NLP) in your weather application:
+    
+    parse_weather_question() – to interpret the user’s natural language input.
+    
+    generate_weather_response() – to generate a human-like response based on the parsed input and actual weather data.
+    
+    🧠 What should parse_weather_question() be doing?
+    This function is responsible for understanding a user's natural language question about the weather — something like:
+    
+    “Will it rain in Sydney tomorrow?”
+    “What's the temperature in Perth over the next 2 days?”
+    “Do I need a jacket today in Melbourne?”
+    
+    To support these, the function needs to extract key elements from the sentence.
+    
+    🔍 Key elements to parse:
+    Element	Purpose	Example Match
+    Location	Which city/place the user is asking about	Perth, Sydney
+    Time Period	Whether they want info for today, tomorrow, or multiple days	today, tomorrow, next 2 days
+    Attribute	What kind of weather info they’re asking for	temperature, rain, weather
+    
+    These 3 pieces form the structure of meaning we want to extract from any user question.
+    
+    🛠️ What does generate_weather_response() do?
+    Once the question is parsed into structured data (like {'city': 'Adelaide', 'days': 2, 'attribute': 'rain'}), this function:
+    
+    Uses that info to look up weather data
+    
+    Generates a natural-language response like:
+    
+    “Here’s the rain forecast for Adelaide: Tomorrow you can expect scattered showers 🌧️.”
+    
+    Summary
+    So before you even start writing the actual functions, you're being asked to:
+    
+    Think about what types of things users might ask (rain, temp, time, place)
+    
+    Design your code to recognize those elements in a flexible and readable way
+    
+    Convert user input → structured info → readable response
+    
+
+
+ME: Can you give me an example of parsing logic you recommend and what are the key components that make up its function?
+AI: 
