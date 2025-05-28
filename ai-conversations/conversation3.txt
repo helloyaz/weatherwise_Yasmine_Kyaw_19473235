@@ -1,3 +1,13 @@
+Conversation about adding visualization aspects into my weather app.
+
+
+
+
+
+
+
+
+
 ME: I want to move onto the visualization section, where I need to add visual elements to the previous weather data.
 The function help provided are below. Please recommend on how to implement them and what is the library being used?
 
