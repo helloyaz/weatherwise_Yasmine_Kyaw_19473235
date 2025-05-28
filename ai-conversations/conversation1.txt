@@ -1,4 +1,4 @@
-Initial AI convo - 3 implementation options comparison
+Initial AI convo - 3 implementation options comparison [14/05]
 
 
 
