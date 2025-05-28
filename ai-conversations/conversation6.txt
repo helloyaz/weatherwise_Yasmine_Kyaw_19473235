@@ -1,3 +1,11 @@
+Conversation about UI implementation into my weather app, and making it appealing and robust.
+
+
+
+
+
+
+
 ME: How can I improve on this by considering error handling? 
     And what else could I do to improve the function function and make it cleaner and concise? 
     Is there also an option for possible prompts to be suggested to the user in a drop-down format?
