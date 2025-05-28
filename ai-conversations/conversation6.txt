@@ -1,4 +1,4 @@
-Conversation about UI implementation into my weather app, and making it appealing and robust.
+Conversation about UI implementation into my weather app, and making it appealing and robust. [27/05]
 
 
 
