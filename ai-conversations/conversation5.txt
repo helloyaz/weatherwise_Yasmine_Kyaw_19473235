@@ -1,3 +1,10 @@
+Conversation about parsing weather logic and how to include natural language considerations in my code.
+
+
+
+
+
+
 ME: Before any functions, what is the section for Natural Language Processing asking for and what are the main elements to parse weather content that I should consider?
 The preliminary comments provided are # Define parse_weather_question() and generate_weather_response() and # Define menu functions using pyinputplus or ipywidgets.
 
