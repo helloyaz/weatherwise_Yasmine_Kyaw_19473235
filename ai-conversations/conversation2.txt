@@ -1,3 +1,9 @@
+Conversation about understanding weather data implementation
+
+
+
+
+
 ME: 
     My focus is weather data functions. The function is asking to define get_weather_data() 
     - how would you recommend I go about this if I want to go with option 1?
