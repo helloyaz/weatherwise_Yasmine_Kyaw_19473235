@@ -1,0 +1,7 @@
+requests>=2.25.0
+matplotlib>=3.4.0
+ipywidgets>=7.6.0
+ipython>=7.20.0
+fetch-my-weather
+hands-on-ai
+pyinputplus
