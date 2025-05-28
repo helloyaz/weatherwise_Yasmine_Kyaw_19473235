@@ -1,4 +1,4 @@
-Conversation about parsing weather logic and how to include natural language considerations in my code.
+Conversation about parsing weather logic and how to include natural language considerations in my code. [26/05]
 
 
 
